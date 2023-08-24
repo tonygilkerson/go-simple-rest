@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/tonygilkerson/go-simple-rest/internal/acectx"
 )
 
 // Main
@@ -32,8 +33,8 @@ func main() {
 		fmt.Fprintf(w, "OK")
 	})
 
-	http.HandleFunc("/about", func(w http.ResponseWriter, r *http.Request){
-		about(w,r)
+	http.HandleFunc("/ctx", func(w http.ResponseWriter, r *http.Request){
+		aceCtxHandler(w,r,dataDir)
 	})
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
@@ -46,7 +47,13 @@ func main() {
 //
 // /////////////////////////////////////////////////////////////////////////////
 
-func about(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "about")
+func aceCtxHandler(w http.ResponseWriter, r *http.Request,dataDir string) {
+	aceCtx := acectx.New()
+	aceContextYamlFile := dataDir + "/ace-context.yaml"
+	aceCtx.LoadAceContext(aceContextYamlFile)
+	
+	out := fmt.Sprintf("ACE Contex: %v",aceCtx)
+	fmt.Fprint(w, out)
+
 }
 

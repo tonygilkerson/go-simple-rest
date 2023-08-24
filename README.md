@@ -1,2 +1,3 @@
 # go-simple-rest
-A simple rest server 
+
+A simple rest server
