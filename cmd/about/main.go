@@ -1,15 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 
-	"github.com/tonygilkerson/go-simple-rest/internal/acectx"
+	"github.com/tonygilkerson/go-simple-rest/internal/env"
 )
 
-// Main
 func main() {
 
 	// Log to the console with date, time and filename prepended
@@ -20,40 +18,34 @@ func main() {
 	//
 	dataDir, exists := os.LookupEnv("ABOUT_DATA_DIR")
 	if exists {
-		log.Printf("Using ABOUT_DATA_DIR to set data directory: %v",dataDir)
+		log.Printf("Using ABOUT_DATA_DIR to set data directory: %v", dataDir)
 	} else {
 		dataDir = "/etc/about"
-		log.Printf("ABOUT_DATA_DIR environment variable not set, using default value: %v",dataDir)
+		log.Printf("ABOUT_DATA_DIR environment variable not set, using default value: %v", dataDir)
 	}
 
 	//
-	// Server up API endpoints
+	// Create Server
 	//
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request){
-		fmt.Fprintf(w, "OK")
+	mux := http.NewServeMux()
+
+	s := &http.Server{
+		Addr:    ":8080",
+		Handler: mux,
+	}
+
+	//
+	// Define routes
+	//
+	env := env.NewEnv(dataDir)
+	mux.HandleFunc("/env/context", env.EnvContextHandler)
+	mux.HandleFunc("/env/version", env.EnvVersionHandler)
+	mux.HandleFunc("/env/version/badge", env.EnvVersionBadgeHandler)
+
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("ok"))
 	})
 
-	http.HandleFunc("/ctx", func(w http.ResponseWriter, r *http.Request){
-		aceCtxHandler(w,r,dataDir)
-	})
-
-	log.Fatal(http.ListenAndServe(":8080", nil))
-	
+	log.Printf("Listening on: %v", s.Addr)
+	log.Fatal(s.ListenAndServe())
 }
-
-// /////////////////////////////////////////////////////////////////////////////
-//
-//	Functions
-//
-// /////////////////////////////////////////////////////////////////////////////
-
-func aceCtxHandler(w http.ResponseWriter, r *http.Request,dataDir string) {
-	aceCtx := acectx.New()
-	aceContextYamlFile := dataDir + "/ace-context.yaml"
-	aceCtx.LoadAceContext(aceContextYamlFile)
-	
-	out := fmt.Sprintf("ACE Contex: %v",aceCtx)
-	fmt.Fprint(w, out)
-
-}
-

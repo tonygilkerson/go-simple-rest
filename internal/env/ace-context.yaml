@@ -1,0 +1,32 @@
+aceEnvVersion: 7.0.20
+domain: test.act3-ace.ai
+domainExternal: test.act3.education
+storageClass:
+  db: ceph-rbd
+ingress:
+  certificate:
+    annotations: null
+    auto: false
+  largeFile:
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/proxy-buffering: "off"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+  vouch:
+    annotations:
+      nginx.ingress.kubernetes.io/auth-response-headers: X-Vouch-IdP-Claims-Sub,X-Vouch-User,X-Vouch-IdP-Claims-Nickname
+      nginx.ingress.kubernetes.io/auth-signin: https://vouch.test.act3-ace.ai/login?url=https://$http_host$request_uri&vouch-failcount=$auth_resp_failcount&X-Vouch-Token=$auth_resp_jwt&error=$auth_resp_err
+      nginx.ingress.kubernetes.io/auth-snippet: |
+        auth_request_set $auth_resp_jwt $upstream_http_x_vouch_jwt;
+        auth_request_set $auth_resp_err $upstream_http_x_vouch_err;
+        auth_request_set $auth_resp_failcount $upstream_http_x_vouch_failcount;
+      nginx.ingress.kubernetes.io/auth-url: http://vouch.ingress-internal.svc.cluster.local:9090/validate
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        rewrite /acelogout https://vouch.test.act3-ace.ai/logout?url=https://git.act3-ace.com/users/sign_in permanent;
+        auth_request_set $user $upstream_http_x_vouch_idp_claims_nickname;
+        auth_request_set $sub $upstream_http_x_vouch_idp_claims_sub;
+        proxy_set_header X-Auth-Subject $sub;
+        proxy_set_header X-Auth-Username $user;
+        proxy_set_header X-Auth-Token $cookie_VouchCookie;
