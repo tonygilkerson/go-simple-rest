@@ -1,22 +1,26 @@
 apiVersion: skaffold/v4beta5
 kind: Config
+
 build:
+  local:
+      push: true
   artifacts:
-    - image: about
-      ko:
-        dependencies:
-          paths:
-            - cmd/about/**
-            - internal/**
-        main: ./cmd/about
+  - image: about
+    ko:
+      dependencies:
+        paths:
+          - cmd/about/**
+          - internal/**
+      main: ./cmd/about
 deploy:
+  # kubeContext: kind-kind
   helm:
     releases:
-    - name: equilibria
-      chartPath: charts/equilibria
+    - name: about
+      chartPath: charts/about
       setValueTemplates:
-        image.repository: "{{.IMAGE_REPO_equilibria}}"
-        image.tag: "{{.IMAGE_TAG_equilibria}}"
+        image.repository: "{{.IMAGE_REPO_about}}"
+        image.tag: "{{.IMAGE_TAG_about}}"
 # portForward:
 #   - resourceType: Service
 #     resourceName: equilibria
@@ -41,12 +45,12 @@ profiles:
   - name: dev
     activation:
       - command: dev
-      - command: debug
-    patches:
-      - op: add
-        path: /deploy/helm/releases/0/setValues
-        value:
-          grafana.URL: http://localhost:3000
-          issuer: selfsigned
-          prometheus.prometheusRule.enabled: "yes"
-          prometheus.serviceMonitor.enabled: "yes"
+    #   - command: debug
+    # patches:
+    #   - op: add
+    #     path: /deploy/helm/releases/0/setValues
+    #     value:
+    #       grafana.URL: http://localhost:3000
+    #       issuer: selfsigned
+    #       prometheus.prometheusRule.enabled: "yes"
+    #       prometheus.serviceMonitor.enabled: "yes"
