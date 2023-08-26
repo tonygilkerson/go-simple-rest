@@ -12,7 +12,7 @@ import (
 )
 
 type Environment struct {
-	DataDir    string
+	ContextFile    string
 	AceContext aceContex
 }
 
@@ -25,17 +25,17 @@ type aceContex struct {
 	} `yaml:"storageClass,omitempty"`
 }
 
-func NewEnv(dataDir string) Environment {
+func NewEnv(contextFile string) Environment {
 
 	var env Environment
-	env.DataDir = dataDir
+	env.ContextFile = contextFile
 	return env
 
 }
 
 func (env *Environment) loadAceContext() error {
 
-	aceContextYamlFile := env.DataDir + "/ace-context.yaml"
+	aceContextYamlFile := env.ContextFile
 	log.Printf("Using aceContextYamlFile: %v", aceContextYamlFile)
 
 	aceContext, err := os.ReadFile(aceContextYamlFile)

@@ -8,7 +8,7 @@ import (
 
 func TestNewEnv(t *testing.T) {
 	type args struct {
-		dataDir string
+		contextFile string
 	}
 	tests := []struct {
 		name string
@@ -18,16 +18,16 @@ func TestNewEnv(t *testing.T) {
 		{
 			name: "hello",
 			args: args{
-				dataDir: "./",
+				contextFile: "./test-ace-context.yaml",
 			},
 			want: Environment{
-				DataDir: "./",
+				ContextFile: "./test-ace-context.yaml",
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewEnv(tt.args.dataDir); !reflect.DeepEqual(got, tt.want) {
+			if got := NewEnv(tt.args.contextFile); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewEnv() = %v, want %v", got, tt.want)
 			}
 		})
@@ -43,7 +43,7 @@ func TestEnvironment_loadAceContext(t *testing.T) {
 		{
 			name: "load context from file",
 			env: &Environment{
-				DataDir: "./internal/env",
+				ContextFile: "./internal/env/test-ace-context.yaml",
 				AceContext: aceContex{
 					AceEnvVersion: "7.0.20",
 					Domain:        "test.act3-ace.ai",

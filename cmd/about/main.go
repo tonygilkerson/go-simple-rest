@@ -16,12 +16,12 @@ func main() {
 	//
 	// Get environment Variables
 	//
-	dataDir, exists := os.LookupEnv("ABOUT_DATA_DIR")
+	contextFile, exists := os.LookupEnv("ABOUT_CONTEXT_FILE")
 	if exists {
-		log.Printf("Using ABOUT_DATA_DIR to set data directory: %v", dataDir)
+		log.Printf("Using ABOUT_CONTEXT_FILE to set data directory: %v", contextFile)
 	} else {
-		dataDir = "/etc/about"
-		log.Printf("ABOUT_DATA_DIR environment variable not set, using default value: %v", dataDir)
+		contextFile = "/etc/about/ace-context.yaml"
+		log.Printf("ABOUT_CONTEXT_FILE environment variable not set, using default value: %v", contextFile)
 	}
 
 	//
@@ -37,7 +37,7 @@ func main() {
 	//
 	// Define routes
 	//
-	env := env.NewEnv(dataDir)
+	env := env.NewEnv(contextFile)
 	mux.HandleFunc("/env/context", env.EnvContextHandler)
 	mux.HandleFunc("/env/version", env.EnvVersionHandler)
 	mux.HandleFunc("/env/version/badge", env.EnvVersionBadgeHandler)
