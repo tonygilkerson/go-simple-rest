@@ -1,0 +1,39 @@
+apiVersion: skaffold/v2beta9
+kind: Config
+build:
+  artifacts:
+    - image: servicedash-api
+      context: .
+  local:
+    useBuildkit: true
+deploy:
+  helm:
+    releases:
+      - name: servicedash-api
+        chartPath: charts/servicedash-api
+        artifactOverrides:
+          image: servicedash-api
+        imageStrategy:
+          helm: {}
+  kubectl:
+    manifests: [charts/servicedash-api/examples/example-ingresses.yaml]
+
+profiles:
+  - name: dev
+    activation:
+      - command: dev
+    patches:
+      - op: add
+        path: /deploy/helm/releases/0/setValues
+        value:
+          fullnameOverride: dev-svcdash
+          serviceAccount.name: dev-ingress-watcher
+          debug: "servicedash:*"
+  - name: kind
+    activation:
+      - kubeContext: kind-ace-development
+    patches:
+      - op: add
+        path: /deploy/helm/releases/0/valuesFiles
+        value:
+          - oidc/client.yaml

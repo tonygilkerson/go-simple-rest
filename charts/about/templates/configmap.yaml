@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ace-context
+data:
+  aceEnvVersion: {{ .Values.aceContext.aceEnvVersion }}
+  ace-context.yaml: |
+    aceEnvVersion: {{ .Values.aceContext.aceEnvVersion }}
+    domain: {{ .Values.aceContext.domain }}
+    domainExternal: {{ .Values.aceContext.domainExternal }}
+    storageClass:
+      db: {{ .Values.aceContext.storageClass.db }}
+    ingress:
+      {{- .Values.aceContext.ingress | toYaml | nindent 6 }}
+ 

@@ -1,0 +1,59 @@
+apiVersion: skaffold/v4beta5
+kind: Config
+build:
+  artifacts:
+    - image: equilibria
+      ko:
+        dependencies:
+          paths:
+            - assets/**
+            - pkg/**
+            - cmd/operator/**
+            - internal/**
+        main: ./cmd/operator
+# manifests:
+#   helm:
+#     releases:
+#       - name: equilibria
+#         chartPath: charts/equilibria
+deploy:
+  helm:
+    releases:
+    - name: equilibria
+      chartPath: charts/equilibria
+      setValueTemplates:
+        image.repository: "{{.IMAGE_REPO_equilibria}}"
+        image.tag: "{{.IMAGE_TAG_equilibria}}"
+
+portForward:
+  - resourceType: Service
+    resourceName: equilibria
+    port: prometheus
+    localPort: 9102
+  - resourceType: Service
+    resourceName: equilibria
+    port: https
+    localPort: 8443
+  - resourceType: Service
+    resourceName: prometheus-stack-grafana
+    namespace: monitor-system
+    port: http-web
+    localPort: 3000
+  - resourceType: Service
+    resourceName: prometheus-operated
+    namespace: monitor-system
+    port: http-web
+    localPort: 9090
+profiles:
+  - name: dev
+    activation:
+      - command: dev
+      - command: debug
+    patches:
+      - op: add
+        path: /deploy/helm/releases/0/setValues
+        value:
+          grafana.URL: http://localhost:3000
+          issuer: selfsigned
+          prometheus.prometheusRule.enabled: "yes"
+          prometheus.serviceMonitor.enabled: "yes"

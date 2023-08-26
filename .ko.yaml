@@ -1,0 +1,14 @@
+defaultBaseImage: gcr.io/distroless/base-debian11:nonroot
+
+builds:
+- id: about
+  main: ./cmd/about
+  env:
+  - GOPRIVATE=git.act3-ace.com
+  flags:
+  - -trimpath
+  ldflags:
+  - -X main.version={{.Env.VERSION}}
+  - -s -w # strip symbols (make the binary smaller)
+  - -extldflags "-static"
+  
