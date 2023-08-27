@@ -18,7 +18,7 @@ func main() {
 	//
 	contextFile, exists := os.LookupEnv("ABOUT_CONTEXT_FILE")
 	if exists {
-		log.Printf("Using ABOUT_CONTEXT_FILE to set data directory: %v", contextFile)
+		log.Printf("Using environment variable ABOUT_CONTEXT_FILE: %v", contextFile)
 	} else {
 		contextFile = "/etc/about/ace-context.yaml"
 		log.Printf("ABOUT_CONTEXT_FILE environment variable not set, using default value: %v", contextFile)

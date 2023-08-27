@@ -31,6 +31,9 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          - name: ABOUT_CONTEXT_FILE
+            value: {{ .Values.aboutContextFile }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
@@ -45,6 +48,13 @@ spec:
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+          - name: ace-context
+            mountPath: /etc/about
+      volumes:
+      - name: ace-context
+        configMap:
+          name: ace-context
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

@@ -1,12 +1,14 @@
 
 # ACE Context info
 aceContext:
-  aceEnvVersion: v0.0.0
+  aceEnvVersion: "0.0.0"
   domain: example.com
   domainExternal: external.example.com
   storageClass:
-    db: dbclass
+    db: example-storage-class
   ingress:
+
+aboutContextFile: /etc/about/ace-context.yaml
 
 replicaCount: 1
 
