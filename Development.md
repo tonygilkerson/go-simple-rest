@@ -16,3 +16,10 @@ ko build ./cmd/about
 ```sh
 skaffold dev --default-repo ghcr.io/tonygilkerson 
 ```
+
+DEVTODO 
+
+- next step mount cm in deployment
+- set ABOUT_CONTEXT_FILE on env for container
+
+
