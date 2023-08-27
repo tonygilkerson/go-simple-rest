@@ -21,36 +21,30 @@ deploy:
       setValueTemplates:
         image.repository: "{{.IMAGE_REPO_about}}"
         image.tag: "{{.IMAGE_TAG_about}}"
-# portForward:
-#   - resourceType: Service
-#     resourceName: equilibria
-#     port: prometheus
-#     localPort: 9102
-#   - resourceType: Service
-#     resourceName: equilibria
-#     port: https
-#     localPort: 8443
-#   - resourceType: Service
-#     resourceName: prometheus-stack-grafana
-#     namespace: monitor-system
-#     port: http-web
-#     localPort: 3000
-#   - resourceType: Service
-#     resourceName: prometheus-operated
-#     namespace: monitor-system
-#     port: http-web
-#     localPort: 9090
 
 profiles:
   - name: dev
     activation:
       - command: dev
-    #   - command: debug
-    # patches:
-    #   - op: add
-    #     path: /deploy/helm/releases/0/setValues
-    #     value:
-    #       grafana.URL: http://localhost:3000
-    #       issuer: selfsigned
-    #       prometheus.prometheusRule.enabled: "yes"
-    #       prometheus.serviceMonitor.enabled: "yes"
+  - name: kind
+    activation:
+      - kubeContext: kind-kind
+    patches:
+      - op: add
+        path: /deploy/helm/releases/0/setValues
+        value:
+          aceContext.aceEnvVersion: "1.2.3"
+          aceContext.domain: about.127.0.0.1.nip.io 
+          aceContext.domainExternal: about.external.127.0.0.1.nip.io
+          aceContext.storageClass.db: standard
+          
+          ingress.enabled: true
+          ingress.hosts:
+          - host: about.127.0.0.1.nip.io
+            paths:
+            - path: /
+              pathType: ImplementationSpecific
+
+
+
+
